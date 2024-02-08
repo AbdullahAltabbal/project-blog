@@ -4,6 +4,9 @@ import styles from './homepage.module.css';
 import { getBlogPostList } from '@/helpers/file-helpers'
 
 async function Home() {
+
+
+
   const blogs = await getBlogPostList();
   return (
     <div className={styles.wrapper}>
