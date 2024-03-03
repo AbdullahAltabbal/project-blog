@@ -72,11 +72,6 @@ function DivisionGroupsDemo({
                     <motion.div layoutId={layoutId}
                       key={layoutId}
                       className={styles.item}
-                    // transition={{
-                    //   type: 'spring',
-                    //   damping: 500,
-                    //   stiffness: 500
-                    // }}
                     />
                   );
                 })}
