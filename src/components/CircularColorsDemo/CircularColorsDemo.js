@@ -1,4 +1,5 @@
-import React from 'react';
+'use client';
+import React, { useId, useState } from 'react';
 import clsx from 'clsx';
 import {
   Play,
@@ -8,6 +9,7 @@ import {
 
 import Card from '@/components/Card';
 import VisuallyHidden from '@/components/VisuallyHidden';
+import { motion, LayoutGroup } from 'framer-motion';
 
 import styles from './CircularColorsDemo.module.css';
 
@@ -18,68 +20,82 @@ const COLORS = [
 ];
 
 function CircularColorsDemo() {
-  // TODO: This value should increase by 1 every second:
-  const timeElapsed = 0;
+  const [timeElapsed, setTimeElapsed] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const id = useId();
+  const selectedColor = COLORS[timeElapsed % COLORS.length];
 
-  // TODO: This value should cycle through the colors in the
-  // COLORS array:
-  const selectedColor = COLORS[0];
+
+  React.useEffect(() => {
+    if (!isPlaying) return;
+    const id = window.setInterval(() => {
+      setTimeElapsed((currentValue) => currentValue + 1)
+    }, 1000)
+
+    return () => window.clearInterval(id)
+  }, [isPlaying])
 
   return (
-    <Card as="section" className={styles.wrapper}>
-      <ul className={styles.colorsWrapper}>
-        {COLORS.map((color, index) => {
-          const isSelected =
-            color.value === selectedColor.value;
+    <LayoutGroup>
+      <Card as="section" className={styles.wrapper}>
+        <ul className={styles.colorsWrapper}>
+          {COLORS.map((color, index) => {
+            const isSelected =
+              color.value === selectedColor.value;
 
-          return (
-            <li
-              className={styles.color}
-              key={index}
-            >
-              {isSelected && (
-                <div
-                  className={
-                    styles.selectedColorOutline
-                  }
-                />
-              )}
-              <div
-                className={clsx(
-                  styles.colorBox,
-                  isSelected &&
-                    styles.selectedColorBox
-                )}
-                style={{
-                  backgroundColor: color.value,
-                }}
+            return (
+              <li
+                className={styles.color}
+                key={index}
               >
-                <VisuallyHidden>
-                  {color.label}
-                </VisuallyHidden>
-              </div>
-            </li>
-          );
-        })}
-      </ul>
+                {isSelected && (
+                  <motion.div
+                    layoutId={`${id}-selected-color-outline}`}
+                    className={
+                      styles.selectedColorOutline
+                    }
+                  />
+                )}
+                <div
+                  className={clsx(
+                    styles.colorBox,
+                    isSelected &&
+                    styles.selectedColorBox
+                  )}
+                  style={{
+                    backgroundColor: color.value,
+                  }}
+                >
+                  <VisuallyHidden>
+                    {color.label}
+                  </VisuallyHidden>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
 
-      <div className={styles.timeWrapper}>
-        <dl className={styles.timeDisplay}>
-          <dt>Time Elapsed</dt>
-          <dd>{timeElapsed}</dd>
-        </dl>
-        <div className={styles.actions}>
-          <button>
-            <Play />
-            <VisuallyHidden>Play</VisuallyHidden>
-          </button>
-          <button>
-            <RotateCcw />
-            <VisuallyHidden>Reset</VisuallyHidden>
-          </button>
+        <div className={styles.timeWrapper}>
+          <dl className={styles.timeDisplay}>
+            <dt>Time Elapsed</dt>
+            <dd>{timeElapsed}</dd>
+          </dl>
+          <div className={styles.actions}>
+            <button onClick={() => setIsPlaying(!isPlaying)}>
+              {isPlaying ? <Pause /> : <Play />}
+              <VisuallyHidden>Play</VisuallyHidden>
+            </button>
+            <button onClick={() => {
+              setIsPlaying(!isPlaying)
+              setTimeElapsed(0)
+            }}>
+              <RotateCcw />
+              <VisuallyHidden>Reset</VisuallyHidden>
+            </button>
+          </div>
         </div>
-      </div>
-    </Card>
+      </Card>
+    </LayoutGroup>
   );
 }
 
